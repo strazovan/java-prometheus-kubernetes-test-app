@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-test-app-deplyoment
+  labels:
+    app: prometheus-test-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prometheus-test-app
+  template:
+    metadata:
+      labels:
+        app: prometheus-test-app
+    spec:
+      containers:
+        - name: prometheus-test-app
+          image: java-prometheus-test
+          imagePullPolicy: Never # this is here just because this is an local image
+          ports:
+            - containerPort: 18080
+
+--- # service
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-test-app-service
+  labels:
+    app: prometheus-test-app
+spec:
+  selector:
+    app: prometheus-test-app
+  ports:
+    - protocol: TCP
+      port: 18080
+      targetPort: 18080
+--- # service monitor
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: test-app-service-monitor
+  labels:
+    release: prometheus-grafana-test
+spec:
+  endpoints:
+    - interval: 10s
+      targetPort: 18080
+      path: /actuator/prometheus
+  selector:
+    matchLabels:
+      app: prometheus-test-app
