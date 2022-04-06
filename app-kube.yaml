@@ -17,7 +17,7 @@ spec:
       containers:
         - name: prometheus-test-app
           image: java-prometheus-test
-          imagePullPolicy: Never # this is here just because this is an local image
+          imagePullPolicy: Never # this is here just because this is a local image
           ports:
             - containerPort: 18080
 
